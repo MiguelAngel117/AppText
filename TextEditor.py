@@ -1,73 +1,69 @@
-import threading
-import time
 import tkinter as tk
+import threading
 
 class TextEditor:
-    def __init__(self):
-        self.text = ""
-        self.num_letters = 0
-        self.num_words = 0
-        self.auto_save_interval = 10  # tiempo en segundos
-
-    def add_text(self, new_text):
-        self.text += new_text
-        self.num_letters += len(new_text)
-        self.num_words = len(self.text.split())
-
+    def __init__(self, root):
+        self.root = root
+        self.root.geometry("500x500+400+200")
+        self.root.title("Procesador de Texto")
+        
+        # Contadores de letras y palabras
+        self.letter_count = 0
+        self.word_count = 0
+        
+        # Creación del editor de texto
+        self.textbox = tk.Text(self.root, height=25, width=60)
+        self.textbox.pack(pady=20)
+        
+        # Creación de las etiquetas de los contadores
+        self.letter_label = tk.Label(self.root, text="Letras: 0")
+        self.letter_label.pack(side="right", padx=10)
+        self.word_label = tk.Label(self.root, text="Palabras: 0")
+        self.word_label.pack(side="left", padx=10)
+        
+        # Hilo para contar las letras
+        self.letter_thread = threading.Thread(target=self.count_letters)
+        self.letter_thread.daemon = True
+        self.letter_thread.start()
+        
+        # Hilo para contar las palabras
+        self.word_thread = threading.Thread(target=self.count_words)
+        self.word_thread.daemon = True
+        self.word_thread.start()
+        
+        # Hilo para auto-guardar
+        self.save_thread = threading.Thread(target=self.auto_save)
+        self.save_thread.daemon = True
+        self.save_thread.start()
+        
+        # Centrar la ventana
+        self.root.eval('tk::PlaceWindow %s center' % self.root.winfo_toplevel())
+        
+    def count_letters(self):
+        while True:
+            # Obtener el número de caracteres en el editor de texto
+            self.letter_count = len(self.textbox.get("1.0", tk.END)) - 1
+            # Actualizar la etiqueta de las letras
+            self.letter_label.config(text=f"Letras: {self.letter_count}")
+    
+    def count_words(self):
+        while True:
+            # Obtener el texto en el editor de texto y separarlo por espacios
+            words = self.textbox.get("1.0", tk.END).split()
+            # Obtener el número de palabras
+            self.word_count = len(words)
+            # Actualizar la etiqueta de las palabras
+            self.word_label.config(text=f"Palabras: {self.word_count}")
+    
     def auto_save(self):
         while True:
-            with open("autosaved.txt", "w") as f:
-                f.write(self.text)
-            time.sleep(self.auto_save_interval)
-
-class TextEditorGUI:
-    def __init__(self, text_editor):
-        self.text_editor = text_editor
-
-        self.root = tk.Tk()
-        self.root.geometry("400x400")
-
-        self.text_area = tk.Text(self.root, height=10)
-        self.text_area.pack()
-
-        self.letter_count_label = tk.Label(self.root, text="Número de letras: 0")
-        self.letter_count_label.pack()
-
-        self.word_count_label = tk.Label(self.root, text="Número de palabras: 0")
-        self.word_count_label.pack()
-
-        self.auto_save_thread = threading.Thread(target=self.text_editor.auto_save, daemon=True)
-        self.auto_save_thread.start()
-
-        self.letter_count_thread = threading.Thread(target=self.update_letter_count, daemon=True)
-        self.letter_count_thread.start()
-
-        self.word_count_thread = threading.Thread(target=self.update_word_count, daemon=True)
-        self.word_count_thread.start()
-
-        self.text_area.bind("<Key>", self.on_text_change)
-
-    def start(self):
-        self.root.mainloop()
-
-    def on_text_change(self, event):
-        new_text = event.char
-        self.text_editor.add_text(new_text)
-
-    def update_letter_count(self):
-        while True:
-            self.letter_count_label.config(text=f"Número de letras: {self.text_editor.num_letters}")
-            time.sleep(1)
-
-    def update_word_count(self):
-        while True:
-            self.word_count_label.config(text=f"Número de palabras: {self.text_editor.num_words}")
-            time.sleep(1)
-
-def main():
-    text_editor = TextEditor()
-    gui = TextEditorGUI(text_editor)
-    gui.start()
-
-if __name__ == '__main__':
-    main()
+            # Obtener el contenido del editor de texto
+            content = self.textbox.get("1.0", tk.END)
+            # Escribir el contenido en un archivo
+            with open("autosave.txt", "w") as f:
+                f.write(content)
+    
+if __name__ == "__main__":
+    root = tk.Tk()
+    editor = TextEditor(root)
+    root.mainloop()
