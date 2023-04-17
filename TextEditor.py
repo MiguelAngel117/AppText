@@ -20,7 +20,11 @@ class TextEditor:
         self.letter_label.pack(side="right", padx=10)
         self.word_label = tk.Label(self.root, text="Palabras: 0")
         self.word_label.pack(side="left", padx=10)
-        
+
+        # Creación del botón de guardar
+        self.save_button = tk.Button(self.root, text="Guardar", command=self.save_document, bg="green")
+        self.save_button.pack(pady=10)
+
         # Hilo para contar las letras
         self.letter_thread = threading.Thread(target=self.count_letters)
         self.letter_thread.daemon = True
@@ -63,6 +67,12 @@ class TextEditor:
             with open("autosave.txt", "w") as f:
                 f.write(content)
     
+    def save_document(self):
+        # Obtener el contenido del editor de texto
+        content = self.textbox.get("1.0", tk.END)
+        # Escribir el contenido en un archivo
+        with open("documento.txt", "w") as f:
+            f.write(content)
 if __name__ == "__main__":
     root = tk.Tk()
     editor = TextEditor(root)
