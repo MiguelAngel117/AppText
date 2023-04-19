@@ -135,12 +135,8 @@ class TextEditor:
     # Método para guardar el contenido actual del editor
     # convertido a mayúsculas
     def save_upper_content(self):
-<<<<<<< HEAD
         while True:   
             time.sleep(1) 
-=======
-        while True:    
->>>>>>> 1b3c399ed006ea4c2fdaa6b5bdd1a7f304acfb95
             content = self.textbox.get("1.0", tk.END)
             content = content.upper()
             with open("upper.txt", "w") as f:
