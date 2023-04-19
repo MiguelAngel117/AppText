@@ -4,7 +4,7 @@ import threading
 class TextEditor:
     def __init__(self, root):
         self.root = root
-        self.root.geometry("500x500+400+200")
+        self.root.geometry("500x580+400+200")
         self.root.title("Procesador de Texto")
         
         # Contadores de letras y palabras
@@ -25,6 +25,10 @@ class TextEditor:
         self.save_button = tk.Button(self.root, text="Guardar", command=self.save_document, bg="green")
         self.save_button.pack(pady=10)
 
+        # Creación del botón de convertir a mayúscula
+        self.upper_button = tk.Button(self.root, text="Mayúscula", command=self.to_upper, bg="green")
+        self.upper_button.pack(pady=10)
+
         # Hilo para contar las letras
         self.letter_thread = threading.Thread(target=self.count_letters)
         self.letter_thread.daemon = True
@@ -40,13 +44,17 @@ class TextEditor:
         self.save_thread.daemon = True
         self.save_thread.start()
         
+        # Hilo para convertir a mayúsculas
+        self.upper_thread = threading.Thread(target=self.save_upper_content)
+        self.upper_thread.start()
+
         # Centrar la ventana
         self.root.eval('tk::PlaceWindow %s center' % self.root.winfo_toplevel())
         
     def count_letters(self):
         while True:
             # Obtener el número de caracteres en el editor de texto
-            self.letter_count = len(self.textbox.get("1.0", tk.END)) - 1
+            self.letter_count = sum(not chr.isspace() for chr in self.textbox.get("1.0", tk.END))
             # Actualizar la etiqueta de las letras
             self.letter_label.config(text=f"Letras: {self.letter_count}")
     
@@ -73,6 +81,24 @@ class TextEditor:
         # Escribir el contenido en un archivo
         with open("documento.txt", "w") as f:
             f.write(content)
+
+    # Método para guardar el contenido actual del editor
+    # convertido a mayúsculas
+    def save_upper_content(self):
+        while True:    
+            content = self.textbox.get("1.0", tk.END)
+            content = content.upper()
+            with open("upper.txt", "w") as f:
+                f.write(content)
+
+    # Método para mostrar en el editor el contenido
+    # convertido a mayúsculas
+    def to_upper(self):
+        with open("upper.txt", "r") as f:
+                content = f.read()
+        self.textbox.delete("1.0", tk.END)
+        self.textbox.insert("1.0",content)
+
 if __name__ == "__main__":
     root = tk.Tk()
     editor = TextEditor(root)
