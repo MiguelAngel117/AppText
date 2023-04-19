@@ -10,15 +10,15 @@ class TextEditor:
         self.root.geometry("500x580+400+200")
         self.root.title("Procesador de Texto")
         
-        # Contadores de letras y palabras
+        # Letter and word counters
         self.letter_count = 0
         self.word_count = 0
         
-        # Creación del editor de texto
+        # Creation of the text editor
         self.textbox = tk.Text(self.root, height=25, width=60)
         self.textbox.pack(pady=20)
         
-        # Creación de las etiquetas de los contadores
+        # Creation of counter labels
         self.letter_label = tk.Label(self.root, text="Letras: 0")
         self.letter_label.pack(side="right", padx=10)
         self.word_label = tk.Label(self.root, text="Palabras: 0")
@@ -28,112 +28,110 @@ class TextEditor:
         self.vowel_label = tk.Label(self.root, text="Vocales: 0")
         self.vowel_label.pack(side="right", padx=10)
 
-        # Creación del botón de guardar
+        # Creation of the save button
         self.save_button = tk.Button(self.root, text="Guardar", command=self.save_document, bg="green")
         self.save_button.pack(pady=10)
 
-        # Creación del botón de convertir a mayúscula
+        # Button to convert to uppercase
         self.upper_button = tk.Button(self.root, text="Mayúscula", command=self.to_upper, bg="green")
         self.upper_button.pack(pady=10)
 
-        # Hilo para contar las letras
+        # Thread to count the letters
         self.letter_thread = threading.Thread(target=self.count_letters)
         self.letter_thread.daemon = True
         self.letter_thread.start()
         
-        # Hilo para contar las palabras
+        # Word count thread
         self.word_thread = threading.Thread(target=self.count_words)
         self.word_thread.daemon = True
         self.word_thread.start()
 
-        # Hilo para contar vocales
+        # vowel count thread
         self.vowel_thread = threading.Thread(target=self.count_vowels)
         self.vowel_thread.daemon = True
         self.vowel_thread.start()
         
-        # Hilo para auto-guardar
+        # Thread to count the Thread to auto-save
         self.save_thread = threading.Thread(target=self.auto_save)
         self.save_thread.daemon = True
         self.save_thread.start()
 
-        #Hilo para subrayar palabras repetidas
+        # Thread to underline repeated words
         self.repeat_thread = threading.Thread(target=self.revise_repeated_words)
         self.repeat_thread.daemon = True
         self.repeat_thread.start()
         
-        # Hilo para convertir a mayúsculas
+        # Thread to convert to uppercase
         self.upper_thread = threading.Thread(target=self.save_upper_content)
         self.upper_thread.start()
 
-        # Centrar la ventana
         self.root.eval('tk::PlaceWindow %s center' % self.root.winfo_toplevel())
         
     def count_letters(self):
         while True:
             time.sleep(1)
-            # Obtener el número de caracteres en el editor de texto
+            # Get the number of characters in the text editor
             self.letter_count = sum(not chr.isspace() for chr in self.textbox.get("1.0", tk.END))
-            # Actualizar la etiqueta de las letras
+            # Update the letter label
             self.letter_label.config(text=f"Letras: {self.letter_count}")
     
     def count_words(self):
         while True:
             time.sleep(1)
-            # Obtener el texto en el editor de texto y separarlo por espacios
+            # Get the text in the text editor and separate it by spaces
             words = self.textbox.get("1.0", tk.END).split()
-            # Obtener el número de palabras
+            # Obtain the number of words
             self.word_count = len(words)
-            # Actualizar la etiqueta de las palabras
+            # Update the word label
             self.word_label.config(text=f"Palabras: {self.word_count}")
 
     def count_vowels(self):
         while True:
             time.sleep(1)
-            # obtenemos el texto que se ha escrito
+            # we obtain the text that has been written
             text = self.textbox.get("1.0", tk.END)
-            # creamos un contador
             count = 0
-            # recorremos el texto para encontrar vocales
+            # we scroll through the text to find vowels
             for letra in text:
-                 # comparamos cada letra en minuscula, con la lista de bocales cobales 
+                 # Each lowercase letter is compared with the list of vowels.
                  if letra.lower() in "aeiou":
                     count = count+1
-            # Obtener el número de vocales
+            # Obtain the number of vowels
             self.vowel_count =  count
-            # Actualizar la etiqueta de las vocales
+            # Update the vowel label
             self.vowel_label.config(text=f"Vocales: {self.vowel_count}")
     
     def revise_repeated_words(self):
         while True:
             time.sleep(1)
-            #Se obtiene todo el contenido y se separan las palabras usando los espacios
+            # All the content is obtained and the words are separated using spaces
             text = self.textbox.get("1.0", tk.END)
             words = text.split()
             repeated_words = set([word for word in words
                                   if words.count(word) > 1])
             for word in repeated_words:
                 text = re.sub(word, Fore.RED + word + Fore.RESET, text)
-            #Actualizar la etiqueta con el numero de palabras repetidas
+            # Update tag with number of repeated words
             self.repeat_label.config(text=f"Palabras repetidas: {len(repeated_words)}")
     
     def auto_save(self):
         while True:
             time.sleep(1)
-            # Obtener el contenido del editor de texto
+            # Get the contents of the text editor
             content = self.textbox.get("1.0", tk.END)
-            # Escribir el contenido en un archivo
+            # Write the content to a file
             with open("autosave.txt", "w") as f:
                 f.write(content)
     
     def save_document(self):
-        # Obtener el contenido del editor de texto
+        # Get the contents of the text editor
         content = self.textbox.get("1.0", tk.END)
-        # Escribir el contenido en un archivo
+        # Write the content to a file
         with open("documento.txt", "w") as f:
             f.write(content)
 
-    # Método para guardar el contenido actual del editor
-    # convertido a mayúsculas
+    # Method to save the current contents of the editor
+    # converted to uppercase
     def save_upper_content(self):
         while True:   
             time.sleep(1) 
@@ -142,8 +140,8 @@ class TextEditor:
             with open("upper.txt", "w") as f:
                 f.write(content)
 
-    # Método para mostrar en el editor el contenido
-    # convertido a mayúsculas
+    # Method to show in the editor the content
+    # converted to uppercase
     def to_upper(self):
         with open("upper.txt", "r") as f:
                 content = f.read()
