@@ -6,6 +6,14 @@ from colorama import Fore, Back, Style
 
 class TextEditor:
     def __init__(self, root):
+        """This method is the constructor of the class, it defines the elements 
+            that will be in the graphic interface and the variables that 
+            the program will have, it also has the instance of root 
+            that allows to initialize the graphic component.
+
+        Args:
+            root (Object Tk): Return a new top level widget on screen SCREENNAME. A new Tcl interpreter will be created
+        """
         self.root = root
         self.root.geometry("500x580+400+200")
         self.root.title("Procesador de Texto")
