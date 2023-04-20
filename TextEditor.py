@@ -128,14 +128,14 @@ class TextEditor:
             # Get the contents of the text editor
             content = self.textbox.get("1.0", tk.END)
             # Write the content to a file
-            with open("autosave.txt", "w") as f:
+            with open("document.txt", "w") as f:
                 f.write(content)
     
     def save_document(self):
         # Get the contents of the text editor
         content = self.textbox.get("1.0", tk.END)
         # Write the content to a file
-        with open("documento.txt", "w") as f:
+        with open("document.txt", "w") as f:
             f.write(content)
 
     # Method to save the current contents of the editor
@@ -145,7 +145,7 @@ class TextEditor:
             time.sleep(1) 
             content = self.textbox.get("1.0", tk.END)
             content = content.upper()
-            with open("upper.txt", "w") as f:
+            with open("documentUpper.txt", "w") as f:
                 f.write(content)
 
     # Method to show in the editor the content
